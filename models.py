@@ -1,11 +1,7 @@
 #schema.py
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-db = SQLAlchemy(app)
+from app import db
+from app import security
 
 competition_map = db.Table('competition_map',
      db.Column('map_id', db.Integer, db.ForeignKey('maps.id')),
@@ -21,6 +17,14 @@ class User(db.Model):
 
 	def __repr__(self):
 		return '<User %r>' % self.username
+
+	def authenticate(username,password):
+		u = User.query.filter(User.username==username).all()
+		if len(u) == 0:
+			return False
+		u = u[0]
+		print (u)
+		return security.Security.check_password(u.password,password)
 
 class Competition(db.Model):
 	__tablename__ = 'competitions'
